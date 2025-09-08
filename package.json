@@ -1,0 +1,38 @@
+{
+  "name": "diploma_verif",
+  "version": "1.0.0",
+  "description": "Blockchain-based diploma verification system using Ethereum smart contracts",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "deploy:local": "npx hardhat ignition deploy ignition/modules/Deploy.js --network localhost",
+    "deploy:sepolia": "npx hardhat ignition deploy ignition/modules/Deploy.js --network sepolia",
+    "frontend:install": "cd frontend && npm install",
+    "frontend:start": "cd frontend && npm start",
+    "frontend:build": "cd frontend && npm run build",
+    "setup": "npm install && npm run frontend:install",
+    "dev": "concurrently \"npm run node\" \"npm run frontend:start\"",
+    "clean": "npx hardhat clean"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "diploma",
+    "verification",
+    "smart-contracts",
+    "education"
+  ],
+  "author": "Diploma Verification Team",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.4.0",
+    "hardhat": "^3.0.4"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
