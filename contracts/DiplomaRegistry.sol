@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title DiplomaRegistry
- * @dev Smart contract for managing diploma certification and verification
+ * @title DiplomaRegistry - Optimized Version
+ * @dev Gas-efficient, privacy-focused diploma verification system
  * @notice This contract allows authorized universities to issue diplomas and anyone to verify them
  */
 contract DiplomaRegistry is AccessControl, ReentrancyGuard {
@@ -16,30 +16,32 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
     bytes32 public constant ADMIN_ROLE = DEFAULT_ADMIN_ROLE;
     bytes32 public constant UNIVERSITY_ROLE = keccak256("UNIVERSITY_ROLE");
     
-    struct DiplomaInfo {
-        string universityName;
-        string studentInfo;      // Non-personal identifier (student ID, etc.)
-        string diplomaDetails;   // Degree type, major, etc.
-        uint256 issuedDate;
-        bool isValid;
-        bool exists;
+    struct DiplomaRecord {
+        address issuer;      // University that issued the diploma
+        uint64  issuedAt;    // Timestamp when diploma was issued (uint64 saves gas)
+        bool    revoked;     // Whether the diploma has been revoked
+        bool    exists;      // Whether this record exists
+        bytes32 degreeType;  // Optional: degree type as bytes32 (gas efficient)
     }
     
-    // Mapping from diploma hash to diploma information
-    mapping(bytes32 => DiplomaInfo) public diplomas;
+    // Single source of truth: diploma hash -> record
+    mapping(bytes32 => DiplomaRecord) public diplomas;
     
-    // Mapping from university name to authorization status
-    mapping(string => bool) public authorizedUniversities;
+    // University authorization: normalized university name -> authorized
+    mapping(bytes32 => bool) public authorizedUniversities;
     
-    // Mapping from university name to wallet address
-    mapping(string => address) public universityAddresses;
+    // University addresses: normalized university name -> address  
+    mapping(bytes32 => address) public universityAddresses;
+    
+    // Reverse lookup: address -> normalized university name (for UI convenience)
+    mapping(address => bytes32) public addressToUniversity;
     
     // ============ EVENTS ============
     
-    event UniversityAuthorized(string indexed universityName, address indexed universityAddress);
-    event UniversityRevoked(string indexed universityName);
-    event DiplomaIssued(bytes32 indexed diplomaHash, string indexed universityName, uint256 timestamp);
-    event DiplomaRevoked(bytes32 indexed diplomaHash, string indexed universityName);
+    event UniversityAuthorized(bytes32 indexed uniKey, string universityName, address indexed universityAddress);
+    event UniversityRevoked(bytes32 indexed uniKey, string universityName);
+    event DiplomaIssued(bytes32 indexed diplomaHash, bytes32 indexed uniKey, uint64 timestamp);
+    event DiplomaRevoked(bytes32 indexed diplomaHash, bytes32 indexed uniKey);
     
     // ============ CONSTRUCTOR ============
     
@@ -47,11 +49,43 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
         _grantRole(ADMIN_ROLE, msg.sender);
     }
     
+    // ============ INTERNAL HELPERS ============
+    
+    /**
+     * @dev Normalize university name to bytes32 key (lowercase, no spaces)
+     * @param universityName The university name to normalize
+     * @return Normalized bytes32 key
+     */
+    function _normalizeUniversityName(string memory universityName) internal pure returns (bytes32) {
+        // In a real implementation, you'd do proper normalization
+        // For now, we'll use keccak256 of the input
+        return keccak256(abi.encodePacked(_toLower(universityName)));
+    }
+    
+    /**
+     * @dev Convert string to lowercase (simple ASCII only)
+     * @param str Input string  
+     * @return Lowercase string
+     */
+    function _toLower(string memory str) internal pure returns (string memory) {
+        bytes memory bStr = bytes(str);
+        bytes memory bLower = new bytes(bStr.length);
+        for (uint i = 0; i < bStr.length; i++) {
+            if ((uint8(bStr[i]) >= 65) && (uint8(bStr[i]) <= 90)) {
+                bLower[i] = bytes1(uint8(bStr[i]) + 32);
+            } else {
+                bLower[i] = bStr[i];
+            }
+        }
+        return string(bLower);
+    }
+    
     // ============ MODIFIERS ============
     
     modifier onlyAuthorizedUniversity(string memory universityName) {
-        require(authorizedUniversities[universityName], "University not authorized");
-        require(universityAddresses[universityName] == msg.sender, "Not authorized university address");
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        require(authorizedUniversities[uniKey], "University not authorized");
+        require(universityAddresses[uniKey] == msg.sender, "Not authorized university address");
         _;
     }
     
@@ -68,15 +102,18 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
     {
         require(bytes(universityName).length > 0, "University name cannot be empty");
         require(universityAddress != address(0), "Invalid university address");
-        require(!authorizedUniversities[universityName], "University already authorized");
         
-        authorizedUniversities[universityName] = true;
-        universityAddresses[universityName] = universityAddress;
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        require(!authorizedUniversities[uniKey], "University already authorized");
+        
+        authorizedUniversities[uniKey] = true;
+        universityAddresses[uniKey] = universityAddress;
+        addressToUniversity[universityAddress] = uniKey;
         
         // Grant university role to the address
         _grantRole(UNIVERSITY_ROLE, universityAddress);
         
-        emit UniversityAuthorized(universityName, universityAddress);
+        emit UniversityAuthorized(uniKey, universityName, universityAddress);
     }
     
     /**
@@ -87,52 +124,52 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
         external 
         onlyRole(ADMIN_ROLE) 
     {
-        require(authorizedUniversities[universityName], "University not authorized");
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        require(authorizedUniversities[uniKey], "University not authorized");
         
-        address universityAddress = universityAddresses[universityName];
+        address universityAddress = universityAddresses[uniKey];
         
-        authorizedUniversities[universityName] = false;
-        delete universityAddresses[universityName];
+        authorizedUniversities[uniKey] = false;
+        delete universityAddresses[uniKey];
+        delete addressToUniversity[universityAddress];
         
         // Revoke university role
         _revokeRole(UNIVERSITY_ROLE, universityAddress);
         
-        emit UniversityRevoked(universityName);
+        emit UniversityRevoked(uniKey, universityName);
     }
     
     // ============ UNIVERSITY FUNCTIONS ============
     
     /**
-     * @dev Issue a new diploma
+     * @dev Issue a new diploma (minimal data, privacy-focused)
      * @param diplomaHash Keccak256 hash of the diploma PDF
      * @param universityName Name of the issuing university
-     * @param studentInfo Non-personal student identifier
-     * @param diplomaDetails Details about the diploma (degree, major, etc.)
+     * @param degreeType Optional degree type (e.g., "BACHELOR_CS", "MASTER_MBA") 
      */
     function issueDiploma(
         bytes32 diplomaHash,
         string memory universityName,
-        string memory studentInfo,
-        string memory diplomaDetails
+        bytes32 degreeType
     ) 
         external 
         onlyAuthorizedUniversity(universityName)
         nonReentrant
     {
         require(diplomaHash != bytes32(0), "Invalid diploma hash");
-        require(bytes(studentInfo).length > 0, "Student info cannot be empty");
         require(!diplomas[diplomaHash].exists, "Diploma already exists");
         
-        diplomas[diplomaHash] = DiplomaInfo({
-            universityName: universityName,
-            studentInfo: studentInfo,
-            diplomaDetails: diplomaDetails,
-            issuedDate: block.timestamp,
-            isValid: true,
-            exists: true
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        
+        diplomas[diplomaHash] = DiplomaRecord({
+            issuer: msg.sender,
+            issuedAt: uint64(block.timestamp),
+            revoked: false,
+            exists: true,
+            degreeType: degreeType
         });
         
-        emit DiplomaIssued(diplomaHash, universityName, block.timestamp);
+        emit DiplomaIssued(diplomaHash, uniKey, uint64(block.timestamp));
     }
     
     /**
@@ -145,74 +182,70 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
         onlyAuthorizedUniversity(universityName)
     {
         require(diplomas[diplomaHash].exists, "Diploma does not exist");
-        require(
-            keccak256(bytes(diplomas[diplomaHash].universityName)) == keccak256(bytes(universityName)),
-            "University mismatch"
-        );
-        require(diplomas[diplomaHash].isValid, "Diploma already revoked");
+        require(diplomas[diplomaHash].issuer == msg.sender, "Not the issuing university");
+        require(!diplomas[diplomaHash].revoked, "Diploma already revoked");
         
-        diplomas[diplomaHash].isValid = false;
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        diplomas[diplomaHash].revoked = true;
         
-        emit DiplomaRevoked(diplomaHash, universityName);
+        emit DiplomaRevoked(diplomaHash, uniKey);
     }
     
     // ============ PUBLIC VIEW FUNCTIONS ============
     
     /**
-     * @dev Verify if a diploma is authentic and valid
+     * @dev Enhanced verification with rich return data
      * @param diplomaHash Hash of the diploma to verify
      * @param universityName Name of the issuing university
-     * @return isAuthentic True if diploma is authentic and valid
+     * @return isValid Whether diploma is authentic and not revoked
+     * @return exists Whether the diploma record exists
+     * @return issuer Address of the issuing university
+     * @return issuedAt Timestamp when diploma was issued
+     * @return revoked Whether the diploma has been revoked
+     * @return degreeType Type of degree (if provided)
      */
     function verifyDiploma(bytes32 diplomaHash, string memory universityName) 
         external 
         view 
-        returns (bool isAuthentic) 
-    {
-        if (!diplomas[diplomaHash].exists) {
-            return false;
-        }
-        
-        DiplomaInfo memory diploma = diplomas[diplomaHash];
-        
-        return (
-            diploma.isValid &&
-            keccak256(bytes(diploma.universityName)) == keccak256(bytes(universityName))
-        );
-    }
-    
-    /**
-     * @dev Get diploma information (public details only)
-     * @param diplomaHash Hash of the diploma
-     * @return exists Whether the diploma exists
-     * @return isValid Whether the diploma is valid (not revoked)
-     * @return universityName Name of the issuing university
-     * @return issuedDate Timestamp when diploma was issued
-     * @return diplomaDetails Details about the diploma
-     */
-    function getDiplomaInfo(bytes32 diplomaHash) 
-        external 
-        view 
         returns (
-            bool exists,
             bool isValid,
-            string memory universityName,
-            uint256 issuedDate,
-            string memory diplomaDetails
+            bool exists, 
+            address issuer,
+            uint64 issuedAt,
+            bool revoked,
+            bytes32 degreeType
         ) 
     {
-        DiplomaInfo memory diploma = diplomas[diplomaHash];
-        return (
-            diploma.exists,
-            diploma.isValid,
-            diploma.universityName,
-            diploma.issuedDate,
-            diploma.diplomaDetails
-        );
+        DiplomaRecord memory record = diplomas[diplomaHash];
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        
+        exists = record.exists;
+        issuer = record.issuer;
+        issuedAt = record.issuedAt;
+        revoked = record.revoked;
+        degreeType = record.degreeType;
+        
+        // Check if diploma is valid (exists, not revoked, from correct university)
+        isValid = exists && 
+                 !revoked && 
+                 universityAddresses[uniKey] == record.issuer;
     }
     
     /**
-     * @dev Check if a university is authorized
+     * @dev Get diploma record (raw data)
+     * @param diplomaHash Hash of the diploma
+     * @return record The complete diploma record
+     */
+    function getDiplomaRecord(bytes32 diplomaHash) 
+        external 
+        view 
+        returns (DiplomaRecord memory record) 
+    {
+        return diplomas[diplomaHash];
+    }
+    
+    /**
+     * @dev Check if a university is authorized (by name)
      * @param universityName Name of the university
      * @return authorized True if university is authorized
      */
@@ -221,11 +254,12 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
         view 
         returns (bool authorized) 
     {
-        return authorizedUniversities[universityName];
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        return authorizedUniversities[uniKey];
     }
     
     /**
-     * @dev Get university address
+     * @dev Get university address by name
      * @param universityName Name of the university
      * @return universityAddress Address of the university
      */
@@ -234,6 +268,20 @@ contract DiplomaRegistry is AccessControl, ReentrancyGuard {
         view 
         returns (address universityAddress) 
     {
-        return universityAddresses[universityName];
+        bytes32 uniKey = _normalizeUniversityName(universityName);
+        return universityAddresses[uniKey];
+    }
+    
+    /**
+     * @dev Get university name by address (for UI convenience)
+     * @param universityAddress Address of the university
+     * @return uniKey Normalized university key
+     */
+    function getUniversityKey(address universityAddress) 
+        external 
+        view 
+        returns (bytes32 uniKey) 
+    {
+        return addressToUniversity[universityAddress];
     }
 }

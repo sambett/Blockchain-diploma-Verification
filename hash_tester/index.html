@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Hash Generator - Diploma Project (Keccak-256)</title>
+    <title>PDF Hash Generator - Diploma Project (FIXED Keccak-256)</title>
     
-    <!-- Add Keccak-256 library for blockchain compatibility -->
+    <!-- FIXED: Add correct Keccak-256 library for blockchain compatibility -->
     <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.js"></script>
     
     <style>
@@ -34,6 +34,15 @@
             text-align: center;
             color: #666;
             margin-bottom: 30px;
+        }
+        
+        .critical-fix {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: #155724;
         }
         
         .upload-area {
@@ -127,30 +136,45 @@
             border-radius: 5px;
             margin: 15px 0;
         }
+        
+        .test-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffd60a;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎓 PDF Hash Generator (Keccak-256)</h1>
-        <p class="subtitle">Blockchain-compatible diploma verification core functionality</p>
+        <h1>🎓 PDF Hash Generator - FIXED!</h1>
+        <p class="subtitle">Now using actual Ethereum Keccak-256 (not SHA3-256)</p>
+        
+        <div class="critical-fix">
+            <h3>🚨 CRITICAL BUG FIXED!</h3>
+            <p><strong>Previous issue:</strong> This tool was using SHA3-256, but Ethereum uses Keccak-256!</p>
+            <p><strong>Fix applied:</strong> Now using <code>keccak256()</code> instead of <code>sha3_256()</code></p>
+            <p><strong>Result:</strong> Hashes now match exactly what your Solidity contracts will produce! 🎯</p>
+        </div>
         
         <div class="blockchain-info">
-            <strong>🔗 Blockchain Ready!</strong><br>
-            This tool now uses <strong>Keccak-256</strong> - the same hashing algorithm used by Ethereum 
-            and your smart contracts. The hashes generated here will be identical to what your 
-            blockchain diploma system will produce!
+            <strong>🔗 Now Truly Blockchain Ready!</strong><br>
+            This tool now uses genuine <strong>Keccak-256</strong> - the exact same hashing algorithm 
+            used by Ethereum smart contracts. The hashes generated here will be identical to what 
+            <code>keccak256()</code> produces in Solidity!
         </div>
         
         <div class="info-box">
             <strong>What does this do?</strong><br>
-            This tool creates a unique "fingerprint" (hash) for any PDF file using Keccak-256. 
+            This tool creates a unique "fingerprint" (hash) for any PDF file using true Keccak-256. 
             In our diploma system, this exact hash will be stored on the Ethereum blockchain 
             to verify authenticity later.
         </div>
         
         <div class="upload-area">
             <h3>📁 Upload Your PDF File</h3>
-            <p>Choose any PDF file to generate its Keccak-256 hash</p>
+            <p>Choose any PDF file to generate its true Keccak-256 hash</p>
             <div class="file-input">
                 <input type="file" id="pdfFile" accept=".pdf" />
             </div>
@@ -163,29 +187,30 @@
         
         <div id="results" class="hidden">
             <div class="result-area">
-                <h3>✅ Keccak-256 Hash Generated Successfully!</h3>
+                <h3>✅ True Keccak-256 Hash Generated Successfully!</h3>
                 
                 <div id="fileInfo" class="file-info">
                     <!-- File information will be displayed here -->
                 </div>
                 
-                <h4>Keccak-256 Hash (Blockchain Compatible):</h4>
+                <h4>Keccak-256 Hash (Ethereum Compatible):</h4>
                 <div id="hashResult" class="hash-result">
                     <!-- Hash will be displayed here -->
                 </div>
                 
                 <div class="comparison-area">
                     <h4>🔍 Hash Analysis:</h4>
-                    <p><strong>Algorithm:</strong> Keccak-256 (Ethereum Standard)</p>
+                    <p><strong>Algorithm:</strong> Keccak-256 (Original Ethereum Standard)</p>
                     <p><strong>Length:</strong> <span id="hashLength"></span> characters</p>
                     <p><strong>Format:</strong> Hexadecimal (0x prefix ready)</p>
-                    <p><strong>Blockchain Ready:</strong> ✅ Compatible with Solidity keccak256()</p>
+                    <p><strong>Blockchain Ready:</strong> ✅ 100% Compatible with Solidity keccak256()</p>
+                    <p><strong>Bug Status:</strong> 🎯 FIXED - Now using correct algorithm!</p>
                 </div>
                 
                 <p><strong>What is this hash?</strong></p>
-                <p>This is a unique 64-character fingerprint of your PDF file using the same algorithm 
-                that Ethereum uses. Even if you change a single letter in the PDF, the hash will be 
-                completely different. This is exactly how your smart contract will verify diploma authenticity!</p>
+                <p>This is a unique 64-character fingerprint of your PDF file using the exact same algorithm 
+                that Ethereum uses in smart contracts. Even if you change a single letter in the PDF, the hash will be 
+                completely different. This hash will now match exactly what keccak256() produces in Solidity!</p>
                 
                 <button class="button" onclick="copyHash()">📋 Copy Hash</button>
                 <button class="button" onclick="copyHashWithPrefix()">📋 Copy with 0x Prefix</button>
@@ -193,29 +218,73 @@
             </div>
         </div>
         
+        <div class="test-section">
+            <h4>🧪 Test the Fix:</h4>
+            <p><strong>Before fix:</strong> sha3_256('test') = <code id="sha3Test">Loading...</code></p>
+            <p><strong>After fix:</strong> keccak256('test') = <code id="keccakTest">Loading...</code></p>
+            <p><strong>Solidity result:</strong> keccak256('test') = <code>9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658</code></p>
+            <p id="testResult">Checking...</p>
+        </div>
+        
         <div class="info-box">
             <strong>🔍 How to test this:</strong><br>
             1. Upload the same PDF file twice → You'll get the same hash<br>
             2. Upload different PDF files → You'll get different hashes<br>
             3. Try editing a PDF and upload again → Hash will change completely!<br>
-            4. <strong>NEW:</strong> These hashes are now compatible with Ethereum smart contracts!
+            4. <strong>FIXED:</strong> These hashes now match exactly what your smart contract expects!
         </div>
         
         <div class="blockchain-info">
             <strong>🚀 Next Steps in Your Project:</strong><br>
-            • <strong>Smart Contract Developer:</strong> Use keccak256() in Solidity with these exact hashes<br>
-            • <strong>Frontend Developer:</strong> Integrate this logic into React app<br>
-            • <strong>Documentation Team:</strong> This demonstrates the core verification concept
+            • <strong>Smart Contract Developer:</strong> Use keccak256() in Solidity - hashes will now match!<br>
+            • <strong>Frontend Developer:</strong> Use same fix in React app (keccak256 not sha3_256)<br>
+            • <strong>Testing Team:</strong> This demonstrates the core verification working correctly<br>
+            • <strong>Security:</strong> No more hash mismatches between frontend and blockchain!
         </div>
     </div>
 
     <script>
+        // Test both functions to show the difference
+        window.addEventListener('load', () => {
+            try {
+                // Test the old (wrong) function
+                if (typeof sha3_256 !== 'undefined') {
+                    const sha3Result = sha3_256('test');
+                    document.getElementById('sha3Test').textContent = sha3Result;
+                }
+                
+                // Test the new (correct) function  
+                if (typeof keccak256 !== 'undefined') {
+                    const keccakResult = keccak256('test');
+                    document.getElementById('keccakTest').textContent = keccakResult;
+                    
+                    // Check if it matches Solidity
+                    const expectedSolidity = '9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658';
+                    const testResultEl = document.getElementById('testResult');
+                    
+                    if (keccakResult === expectedSolidity) {
+                        testResultEl.innerHTML = '✅ <strong>PERFECT!</strong> Keccak256 now matches Solidity exactly!';
+                        testResultEl.style.color = '#155724';
+                        testResultEl.style.fontWeight = 'bold';
+                    } else {
+                        testResultEl.innerHTML = '❌ Still not matching - check library';
+                        testResultEl.style.color = '#721c24';
+                    }
+                } else {
+                    document.getElementById('testResult').innerHTML = '❌ Keccak256 function not available';
+                }
+            } catch (error) {
+                console.error('Library test error:', error);
+                document.getElementById('testResult').innerHTML = '❌ Error testing libraries: ' + error.message;
+            }
+        });
+
         // Check if Keccak library is loaded
-        if (typeof sha3_256 === 'undefined') {
+        if (typeof keccak256 === 'undefined') {
             alert('Keccak-256 library failed to load. Please check your internet connection.');
         }
 
-        // Main function to generate Keccak-256 hash from PDF file
+        // Main function to generate Keccak-256 hash from PDF file (FIXED!)
         async function generateHash() {
             const fileInput = document.getElementById('pdfFile');
             const file = fileInput.files[0];
@@ -243,8 +312,10 @@
                 // Convert to Uint8Array for Keccak-256
                 const uint8Array = new Uint8Array(arrayBuffer);
                 
-                // Generate Keccak-256 hash (Ethereum compatible!)
-                const hash = sha3_256(uint8Array);
+                // CRITICAL FIX: Generate TRUE Keccak-256 hash (Ethereum compatible!)
+                // OLD (WRONG): const hash = sha3_256(uint8Array);
+                // NEW (CORRECT):
+                const hash = keccak256(uint8Array);
                 
                 // Display results
                 displayResults(file, hash);
@@ -283,8 +354,9 @@
             // Store hash for copying
             window.currentHash = hash;
             
-            console.log('Generated Keccak-256 hash:', hash);
+            console.log('Generated TRUE Keccak-256 hash:', hash);
             console.log('Hash length:', hash.length, 'characters');
+            console.log('🎯 This hash will now match your Solidity contract exactly!');
         }
         
         // Copy hash to clipboard
@@ -350,18 +422,6 @@
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 document.getElementById('pdfFile').files = files;
-            }
-        });
-        
-        // Test the Keccak library on page load
-        window.addEventListener('load', () => {
-            try {
-                // Test with a simple string
-                const testHash = sha3_256('test');
-                console.log('Keccak-256 library working! Test hash:', testHash);
-            } catch (error) {
-                console.error('Keccak-256 library error:', error);
-                alert('Error loading Keccak-256 library. Please refresh the page.');
             }
         });
     </script>
