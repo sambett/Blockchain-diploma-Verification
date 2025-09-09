@@ -1,4 +1,5 @@
 import "@nomicfoundation/hardhat-toolbox";
+import "dotenv/config";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 export default {
@@ -11,9 +12,8 @@ export default {
       url: "http://127.0.0.1:8545"
     },
     sepolia: {
-      url: `https://eth-sepolia.g.alchemy.com/v2/YOUR-API-KEY`,
-      accounts: []
-      // Add your private key when deploying to testnet
+      url: process.env.SEPOLIA_RPC_URL || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
     }
   },
   paths: {

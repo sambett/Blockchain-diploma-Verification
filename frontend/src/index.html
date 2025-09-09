@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 Diploma Verification System - Complete Testing Interface</title>
+    <title>🎓 Diploma Verification System - Production Ready</title>
     
     <!-- Web3 Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- CRITICAL FIX: Use keccak256 not sha3_256! -->
     <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.js"></script>
     
     <style>
@@ -41,13 +40,21 @@
             margin-bottom: 30px;
         }
         
-        .critical-fix {
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-            border-radius: 8px;
+        .live-indicator {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            text-align: center;
             padding: 15px;
+            border-radius: 10px;
             margin: 20px 0;
-            color: #155724;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
         }
         
         .section {
@@ -72,6 +79,7 @@
         
         .connected { background: #d4edda; color: #155724; }
         .disconnected { background: #f8d7da; color: #721c24; }
+        .connecting { background: #fff3cd; color: #856404; }
         
         input, select, textarea {
             width: 100%;
@@ -120,6 +128,7 @@
         .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
         .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
         .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
         
         .hash-display {
             background: #f8f9fa;
@@ -130,6 +139,23 @@
             word-break: break-all;
             font-family: 'Courier New', monospace;
             font-size: 12px;
+        }
+        
+        .contract-info {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+        
+        .network-info {
+            background: #f3e5f5;
+            border: 2px solid #9c27b0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
         }
         
         .workflow-steps {
@@ -182,17 +208,50 @@
             .two-column { grid-template-columns: 1fr; }
             .workflow-steps { flex-direction: column; }
         }
+        
+        .network-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            align-items: center;
+        }
+        
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎓 Diploma Verification System - FIXED!</h1>
-        <p class="subtitle">Now using correct Keccak-256 hashing (Ethereum compatible)</p>
+        <h1>🎓 Diploma Verification System</h1>
+        <p class="subtitle">Production-Ready Blockchain Application</p>
         
-        <div class="critical-fix">
-            <strong>🚨 CRITICAL BUG FIXED!</strong><br>
-            This system now uses proper <strong>Keccak-256</strong> hashing (like Ethereum), not SHA3-256!<br>
-            Hashes generated here will now match your smart contract exactly. 🎯
+        <div class="live-indicator">
+            ✨ PRODUCTION READY ✨<br>
+            Multi-network support with dynamic configuration!
+        </div>
+        
+        <!-- Network & Contract Info -->
+        <div class="network-info">
+            <strong>🌐 Network Information:</strong><br>
+            <strong>Current Network:</strong> <span id="currentNetwork">Detecting...</span><br>
+            <strong>Chain ID:</strong> <span id="currentChainId">-</span><br>
+            <strong>Status:</strong> <span id="networkStatus">Checking...</span>
+        </div>
+        
+        <div class="contract-info">
+            <strong>📋 Smart Contract Info:</strong><br>
+            <strong>Address:</strong> <span id="contractAddress">Not loaded</span><br>
+            <strong>Status:</strong> <span id="contractStatus">Checking...</span><br>
+            <strong>Admin:</strong> <span id="contractAdmin">-</span>
         </div>
         
         <!-- Connection Status -->
@@ -200,23 +259,30 @@
             🔌 Not Connected to Blockchain
         </div>
         
+        <!-- Network Selection -->
+        <div class="section">
+            <h3>🔗 Network & Connection</h3>
+            <div class="network-selector">
+                <label>Target Network:</label>
+                <select id="networkSelector">
+                    <option value="localhost">Localhost (Development)</option>
+                    <option value="sepolia">Sepolia Testnet</option>
+                </select>
+                <button class="button" onclick="switchNetwork()">Switch Network</button>
+            </div>
+            <button class="button" onclick="connectWallet()">Connect MetaMask</button>
+            <button class="button" onclick="testContract()">Test Contract</button>
+            <button class="button" onclick="loadContractInfo()">Refresh Contract Info</button>
+            
+            <div id="connectionResults"></div>
+        </div>
+        
         <!-- Workflow Steps -->
         <div class="workflow-steps">
             <div class="step" id="step1">1. Connect</div>
-            <div class="step" id="step2">2. Deploy Contract</div>
-            <div class="step" id="step3">3. Add University</div>
-            <div class="step" id="step4">4. Issue Diploma</div>
-            <div class="step" id="step5">5. Verify</div>
-        </div>
-        
-        <!-- Connection Section -->
-        <div class="section">
-            <h3>🔗 Blockchain Connection</h3>
-            <button class="button" onclick="connectWallet()">Connect MetaMask</button>
-            <button class="button" onclick="deployContract()">Deploy Contract</button>
-            <div id="contractInfo" class="result info" style="display: none;">
-                Contract Address: <span id="contractAddress"></span>
-            </div>
+            <div class="step" id="step2">2. Add University</div>
+            <div class="step" id="step3">3. Issue Diploma</div>
+            <div class="step" id="step4">4. Verify</div>
         </div>
     </div>
     
@@ -267,7 +333,7 @@
     <!-- Verification Section -->
     <div class="container">
         <div class="section verify-section">
-            <h3>✅ Enhanced Verification (Anyone Can Verify)</h3>
+            <h3>✅ Diploma Verification (Anyone Can Verify)</h3>
             <div class="two-column">
                 <div>
                     <h4>Verify Diploma</h4>
@@ -286,43 +352,273 @@
         </div>
     </div>
     
-    <!-- Testing Instructions -->
+    <!-- Debug Section -->
     <div class="container">
         <div class="section">
-            <h3>📋 Testing Instructions - UPDATED!</h3>
-            <ol>
-                <li><strong>Connect:</strong> Click "Connect MetaMask" and "Deploy Contract"</li>
-                <li><strong>Add University:</strong> As admin, add a university with wallet address</li>
-                <li><strong>Issue Diploma:</strong> Switch to university account, upload PDF, issue diploma</li>
-                <li><strong>Verify:</strong> Upload same PDF to verify authenticity - now with rich data!</li>
-                <li><strong>Test Fraud:</strong> Upload different PDF - should fail verification</li>
-                <li><strong>NEW:</strong> Verification now shows issuer, issue date, revocation status, and degree type!</li>
-            </ol>
+            <h3>🔧 Debug Information</h3>
+            <button class="button" onclick="toggleDebug()">Toggle Debug Info</button>
+            <div id="debugInfo" class="debug-info" style="display: none;">
+                Debug information will appear here...
+            </div>
         </div>
     </div>
 
-    <script>
-        // Global variables
+    <!-- Configuration and Contract Management Script -->
+    <script type="module">
+        // ============ NETWORK AND CONTRACT CONFIGURATION ============
+        
+        const NETWORKS = {
+            localhost: {
+                name: 'Localhost',
+                chainId: 31337,
+                rpcUrl: 'http://127.0.0.1:8545',
+                blockExplorer: 'http://localhost:8545'
+            },
+            sepolia: {
+                name: 'Sepolia Testnet',
+                chainId: 11155111,
+                rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/AAYo6M97q2EH6ob8ohhYg',
+                blockExplorer: 'https://sepolia.etherscan.io'
+            }
+        };
+        
+        const CONTRACT_ADDRESSES = {
+            localhost: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+            sepolia: null // Will be set after deployment
+        };
+        
+        const CONTRACT_ABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "universityName",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "universityAddress",
+                        "type": "address"
+                    }
+                ],
+                "name": "authorizeUniversity",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "ADMIN_ROLE",
+                "outputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "",
+                        "type": "bytes32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "role",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "hasRole",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "diplomaHash",
+                        "type": "bytes32"
+                    }
+                ],
+                "name": "getDiplomaRecord",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "issuer",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "issuedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "revoked",
+                                "type": "bool"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "exists",
+                                "type": "bool"
+                            },
+                            {
+                                "internalType": "bytes32",
+                                "name": "degreeType",
+                                "type": "bytes32"
+                            }
+                        ],
+                        "internalType": "struct DiplomaRegistry.DiplomaRecord",
+                        "name": "record",
+                        "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "universityName",
+                        "type": "string"
+                    }
+                ],
+                "name": "isUniversityAuthorized",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "authorized",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "diplomaHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "universityName",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "degreeType",
+                        "type": "bytes32"
+                    }
+                ],
+                "name": "issueDiploma",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "diplomaHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "universityName",
+                        "type": "string"
+                    }
+                ],
+                "name": "verifyDiploma",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "isValid",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "exists",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "issuer",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "issuedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "revoked",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "degreeType",
+                        "type": "bytes32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+        
+        // Global state
         let provider;
         let signer;
         let contract;
         let userAccount;
+        let currentNetwork;
+        let targetNetwork = 'localhost'; // Default to localhost
         
-        // Updated Contract ABI (with optimized functions)
-        const contractABI = [
-            "constructor()",
-            "function authorizeUniversity(string memory universityName, address universityAddress) external",
-            "function issueDiploma(bytes32 diplomaHash, string memory universityName, bytes32 degreeType) external",
-            "function verifyDiploma(bytes32 diplomaHash, string memory universityName) external view returns (bool isValid, bool exists, address issuer, uint64 issuedAt, bool revoked, bytes32 degreeType)",
-            "function getDiplomaRecord(bytes32 diplomaHash) external view returns (tuple(address issuer, uint64 issuedAt, bool revoked, bool exists, bytes32 degreeType))",
-            "function isUniversityAuthorized(string memory universityName) external view returns (bool)",
-            "function getUniversityAddress(string memory universityName) external view returns (address)",
-            "event UniversityAuthorized(bytes32 indexed uniKey, string universityName, address indexed universityAddress)",
-            "event DiplomaIssued(bytes32 indexed diplomaHash, bytes32 indexed uniKey, uint64 timestamp)",
-            "event DiplomaRevoked(bytes32 indexed diplomaHash, bytes32 indexed uniKey)"
-        ];
+        // Make functions globally available
+        window.connectWallet = connectWallet;
+        window.testContract = testContract;
+        window.loadContractInfo = loadContractInfo;
+        window.switchNetwork = switchNetwork;
+        window.addUniversity = addUniversity;
+        window.checkUniversity = checkUniversity;
+        window.issueDiploma = issueDiploma;
+        window.verifyDiploma = verifyDiploma;
+        window.toggleDebug = toggleDebug;
         
-        // Update connection status
+        // ============ UTILITY FUNCTIONS ============
+        
+        function log(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            const debugInfo = document.getElementById('debugInfo');
+            if (debugInfo) {
+                const timestamp = new Date().toLocaleTimeString();
+                debugInfo.innerHTML += `[${timestamp}] ${message}\n`;
+                debugInfo.scrollTop = debugInfo.scrollHeight;
+            }
+        }
+        
         function updateConnectionStatus(connected, message) {
             const status = document.getElementById('connectionStatus');
             if (connected) {
@@ -334,12 +630,10 @@
             }
         }
         
-        // Update workflow steps
         function updateStep(stepNumber, state = 'active') {
             const step = document.getElementById(`step${stepNumber}`);
             step.className = `step ${state}`;
             
-            // Mark previous steps as completed
             for (let i = 1; i < stepNumber; i++) {
                 const prevStep = document.getElementById(`step${i}`);
                 if (!prevStep.classList.contains('completed')) {
@@ -348,196 +642,6 @@
             }
         }
         
-        // CRITICAL FIX: Generate correct Keccak-256 hash (Ethereum compatible!)
-        async function generateKeccakHash(file) {
-            if (!file) return null;
-            
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                
-                // FIXED: Use keccak256 not sha3_256!
-                // This is the actual Ethereum keccak256, not NIST SHA3-256
-                const hash = keccak256(uint8Array);
-                return '0x' + hash;
-            } catch (error) {
-                console.error('Keccak-256 hash generation error:', error);
-                return null;
-            }
-        }
-        
-        // Connect to MetaMask
-        async function connectWallet() {
-            try {
-                if (typeof window.ethereum === 'undefined') {
-                    throw new Error('MetaMask not installed');
-                }
-                
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                signer = provider.getSigner();
-                userAccount = await signer.getAddress();
-                
-                updateConnectionStatus(true, `Connected: ${userAccount.slice(0,8)}...`);
-                updateStep(1, 'completed');
-                
-                showResult('Connection successful!', 'success');
-            } catch (error) {
-                showResult(`Connection failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // Deploy contract (simplified - in real app, contract would be pre-deployed)
-        async function deployContract() {
-            try {
-                if (!signer) {
-                    throw new Error('Please connect wallet first');
-                }
-                
-                // For testing, we'll simulate contract deployment
-                // In real deployment, you'd use the actual bytecode
-                showResult('Contract deployed successfully! (Simulated)', 'success');
-                document.getElementById('contractInfo').style.display = 'block';
-                document.getElementById('contractAddress').textContent = '0x1234...abcd (Local Testing)';
-                
-                updateStep(2, 'completed');
-            } catch (error) {
-                showResult(`Deployment failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // Add university (admin function)
-        async function addUniversity() {
-            try {
-                const name = document.getElementById('universityName').value;
-                const address = document.getElementById('universityAddress').value;
-                
-                if (!name || !address) {
-                    throw new Error('Please fill in all fields');
-                }
-                
-                // Simulate contract call
-                showResult(`University "${name}" added successfully!`, 'success', 'adminResults');
-                updateStep(3, 'completed');
-                
-                // Clear form
-                document.getElementById('universityName').value = '';
-                document.getElementById('universityAddress').value = '';
-                
-            } catch (error) {
-                showResult(`Add university failed: ${error.message}`, 'error', 'adminResults');
-            }
-        }
-        
-        // Check university status
-        async function checkUniversity() {
-            try {
-                const name = document.getElementById('checkUniversityName').value;
-                if (!name) {
-                    throw new Error('Please enter university name');
-                }
-                
-                // Simulate contract call
-                const authorized = Math.random() > 0.5; // Random for testing
-                const message = authorized ? 
-                    `✅ "${name}" is authorized` : 
-                    `❌ "${name}" is not authorized`;
-                    
-                showResult(message, authorized ? 'success' : 'error', 'adminResults');
-                
-            } catch (error) {
-                showResult(`Check failed: ${error.message}`, 'error', 'adminResults');
-            }
-        }
-        
-        // Issue diploma (updated for new contract)
-        async function issueDiploma() {
-            try {
-                const file = document.getElementById('diplomaFile').files[0];
-                const universityName = document.getElementById('issueUniversityName').value;
-                const degreeType = document.getElementById('degreeType').value;
-                
-                if (!file || !universityName) {
-                    throw new Error('Please provide PDF file and university name');
-                }
-                
-                // Generate Keccak-256 hash (FIXED!)
-                const hash = await generateKeccakHash(file);
-                if (!hash) {
-                    throw new Error('Failed to generate Keccak-256 hash');
-                }
-                
-                // Display hash
-                document.getElementById('generatedHash').textContent = hash;
-                
-                // Simulate contract call
-                showResult(`Diploma issued successfully!\\nHash: ${hash}\\nUniversity: ${universityName}\\nDegree Type: ${degreeType || 'Not specified'}`, 'success', 'universityResults');
-                updateStep(4, 'completed');
-                
-            } catch (error) {
-                showResult(`Issue diploma failed: ${error.message}`, 'error', 'universityResults');
-            }
-        }
-        
-        // Enhanced verify diploma with rich data
-        async function verifyDiploma() {
-            try {
-                const file = document.getElementById('verifyFile').files[0];
-                const universityName = document.getElementById('verifyUniversityName').value;
-                
-                if (!file || !universityName) {
-                    throw new Error('Please provide PDF file and university name');
-                }
-                
-                // Generate Keccak-256 hash (FIXED!)
-                const hash = await generateKeccakHash(file);
-                if (!hash) {
-                    throw new Error('Failed to generate Keccak-256 hash');
-                }
-                
-                // Display hash
-                document.getElementById('verificationHash').textContent = hash;
-                
-                // Simulate enhanced verification (check against issued diploma hash)
-                const generatedHash = document.getElementById('generatedHash').textContent;
-                const isValid = (hash === generatedHash);
-                
-                // Create rich verification result
-                const resultDiv = document.createElement('div');
-                resultDiv.className = `verification-result ${isValid ? 'verification-valid' : 'verification-invalid'}`;
-                
-                if (isValid) {
-                    resultDiv.innerHTML = `
-                        <h4>✅ AUTHENTIC DIPLOMA</h4>
-                        <p><strong>Status:</strong> Valid and Authentic</p>
-                        <p><strong>Issuer:</strong> ${universityName}</p>
-                        <p><strong>Issue Date:</strong> ${new Date().toLocaleDateString()}</p>
-                        <p><strong>Diploma Hash:</strong> ${hash}</p>
-                        <p><strong>Degree Type:</strong> ${document.getElementById('degreeType').value || 'Not specified'}</p>
-                        <p><strong>Revoked:</strong> No</p>
-                        <p>🎯 This diploma is genuine and was issued by an authorized university.</p>
-                    `;
-                    updateStep(5, 'completed');
-                } else {
-                    resultDiv.innerHTML = `
-                        <h4>❌ INVALID DIPLOMA</h4>
-                        <p><strong>Status:</strong> Not Authentic</p>
-                        <p><strong>Reason:</strong> Diploma hash not found in blockchain records</p>
-                        <p><strong>Verification Hash:</strong> ${hash}</p>
-                        <p>⚠️ This diploma cannot be verified as authentic.</p>
-                    `;
-                }
-                
-                const container = document.getElementById('verifyResults');
-                container.innerHTML = '';
-                container.appendChild(resultDiv);
-                
-            } catch (error) {
-                showResult(`Verification failed: ${error.message}`, 'error', 'verifyResults');
-            }
-        }
-        
-        // Show result message
         function showResult(message, type, containerId = null) {
             const resultDiv = document.createElement('div');
             resultDiv.className = `result ${type}`;
@@ -547,36 +651,421 @@
                 const container = document.getElementById(containerId);
                 container.innerHTML = '';
                 container.appendChild(resultDiv);
-            } else {
-                // Show in first available results container
-                const containers = document.querySelectorAll('[id$="Results"]');
-                if (containers.length > 0) {
-                    containers[0].innerHTML = '';
-                    containers[0].appendChild(resultDiv);
-                }
             }
             
-            // Auto-hide after 5 seconds for success messages
-            if (type === 'success') {
-                setTimeout(() => {
-                    if (resultDiv.parentNode) {
-                        resultDiv.style.opacity = '0';
-                        setTimeout(() => {
-                            if (resultDiv.parentNode) {
-                                resultDiv.remove();
-                            }
-                        }, 500);
-                    }
-                }, 5000);
+            log(message.replace(/<br>/g, ' '), type);
+        }
+        
+        // ============ NETWORK MANAGEMENT ============
+        
+        async function detectCurrentNetwork() {
+            if (!window.ethereum) return null;
+            
+            try {
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const numericChainId = parseInt(chainId, 16);
+                
+                return Object.values(NETWORKS).find(network => 
+                    network.chainId === numericChainId
+                ) || null;
+            } catch (error) {
+                log(`Network detection failed: ${error.message}`, 'error');
+                return null;
             }
         }
         
-        // Auto-generate hash when file is selected (FIXED to use Keccak-256!)
+        function getContractAddress(network) {
+            const address = CONTRACT_ADDRESSES[network];
+            if (!address) {
+                throw new Error(`Contract not deployed on ${network}`);
+            }
+            return address;
+        }
+        
+        async function switchNetwork() {
+            const selectedNetwork = document.getElementById('networkSelector').value;
+            targetNetwork = selectedNetwork;
+            
+            if (!window.ethereum) {
+                showResult('MetaMask not detected', 'error', 'connectionResults');
+                return;
+            }
+            
+            const network = NETWORKS[selectedNetwork];
+            if (!network) {
+                showResult(`Unknown network: ${selectedNetwork}`, 'error', 'connectionResults');
+                return;
+            }
+            
+            try {
+                updateConnectionStatus(false, 'Switching network...');
+                
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: `0x${network.chainId.toString(16)}` }],
+                });
+                
+                log(`Switched to ${network.name}`, 'success');
+                await loadContractInfo();
+                
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                {
+                                    chainId: `0x${network.chainId.toString(16)}`,
+                                    chainName: network.name,
+                                    rpcUrls: [network.rpcUrl],
+                                    blockExplorerUrls: [network.blockExplorer],
+                                },
+                            ],
+                        });
+                        log(`Added and switched to ${network.name}`, 'success');
+                    } catch (addError) {
+                        showResult(`Failed to add network: ${addError.message}`, 'error', 'connectionResults');
+                    }
+                } else {
+                    showResult(`Failed to switch network: ${switchError.message}`, 'error', 'connectionResults');
+                }
+            }
+        }
+        
+        // ============ CONTRACT MANAGEMENT ============
+        
+        async function loadContractInfo() {
+            try {
+                currentNetwork = await detectCurrentNetwork();
+                
+                if (currentNetwork) {
+                    document.getElementById('currentNetwork').textContent = currentNetwork.name;
+                    document.getElementById('currentChainId').textContent = currentNetwork.chainId;
+                    document.getElementById('networkStatus').textContent = '✅ Connected';
+                    document.getElementById('networkStatus').style.color = '#28a745';
+                    
+                    const networkKey = Object.keys(NETWORKS).find(key => 
+                        NETWORKS[key].chainId === currentNetwork.chainId
+                    );
+                    
+                    if (networkKey && CONTRACT_ADDRESSES[networkKey]) {
+                        const contractAddress = CONTRACT_ADDRESSES[networkKey];
+                        document.getElementById('contractAddress').textContent = contractAddress;
+                        document.getElementById('contractStatus').textContent = '✅ Available';
+                        document.getElementById('contractStatus').style.color = '#28a745';
+                    } else {
+                        document.getElementById('contractAddress').textContent = 'Not deployed';
+                        document.getElementById('contractStatus').textContent = '❌ Not deployed';
+                        document.getElementById('contractStatus').style.color = '#dc3545';
+                    }
+                } else {
+                    document.getElementById('currentNetwork').textContent = 'Unknown';
+                    document.getElementById('currentChainId').textContent = '-';
+                    document.getElementById('networkStatus').textContent = '❌ Unknown network';
+                    document.getElementById('networkStatus').style.color = '#dc3545';
+                }
+                
+            } catch (error) {
+                log(`Failed to load contract info: ${error.message}`, 'error');
+            }
+        }
+        
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask not installed');
+                }
+                
+                updateConnectionStatus(false, 'Connecting...');
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                signer = provider.getSigner();
+                userAccount = await signer.getAddress();
+                
+                // Detect current network
+                currentNetwork = await detectCurrentNetwork();
+                
+                if (!currentNetwork) {
+                    throw new Error('Unknown network detected');
+                }
+                
+                // Get contract address for current network
+                const networkKey = Object.keys(NETWORKS).find(key => 
+                    NETWORKS[key].chainId === currentNetwork.chainId
+                );
+                
+                if (!networkKey || !CONTRACT_ADDRESSES[networkKey]) {
+                    throw new Error(`Contract not deployed on ${currentNetwork.name}`);
+                }
+                
+                const contractAddress = CONTRACT_ADDRESSES[networkKey];
+                contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+                
+                updateConnectionStatus(true, `Connected: ${userAccount.slice(0,8)}... on ${currentNetwork.name}`);
+                updateStep(1, 'completed');
+                
+                await loadContractInfo();
+                
+                // Load admin info
+                const adminRole = await contract.ADMIN_ROLE();
+                const isAdmin = await contract.hasRole(adminRole, userAccount);
+                document.getElementById('contractAdmin').textContent = isAdmin ? 
+                    `${userAccount.slice(0,8)}... (You are admin!)` : 'Different address';
+                
+                showResult(`✅ Connected successfully!\\n📍 Account: ${userAccount}\\n🌐 Network: ${currentNetwork.name}\\n🔗 Contract: ${contractAddress}\\n👤 Admin: ${isAdmin ? 'Yes' : 'No'}`, 'success', 'connectionResults');
+                
+                log(`Connected to ${currentNetwork.name} with account ${userAccount}`, 'success');
+                
+            } catch (error) {
+                updateConnectionStatus(false, 'Connection failed');
+                showResult(`Connection failed: ${error.message}`, 'error', 'connectionResults');
+                log(`Connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testContract() {
+            try {
+                if (!contract) {
+                    throw new Error('Please connect wallet first');
+                }
+                
+                const isAuthorized = await contract.isUniversityAuthorized("TestUniversity");
+                
+                showResult(`✅ Contract connection successful!\\n🔍 Test query result: University "TestUniversity" authorized = ${isAuthorized}\\n📍 Contract address: ${contract.address}\\n🌐 Network: ${currentNetwork.name}`, 'success', 'connectionResults');
+                
+                log(`Contract test successful on ${currentNetwork.name}`, 'success');
+                
+            } catch (error) {
+                showResult(`❌ Contract test failed: ${error.message}`, 'error', 'connectionResults');
+                log(`Contract test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // ============ HASH GENERATION ============
+        
+        async function generateKeccakHash(file) {
+            if (!file) return null;
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const hash = keccak256(uint8Array);
+                return '0x' + hash;
+            } catch (error) {
+                log(`Keccak-256 hash generation error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+        
+        // ============ ADMIN FUNCTIONS ============
+        
+        async function addUniversity() {
+            try {
+                if (!contract) {
+                    throw new Error('Please connect wallet first');
+                }
+                
+                const name = document.getElementById('universityName').value;
+                const address = document.getElementById('universityAddress').value;
+                
+                if (!name || !address) {
+                    throw new Error('Please fill in all fields');
+                }
+                
+                showResult('🔄 Adding university to blockchain...', 'info', 'adminResults');
+                
+                const tx = await contract.authorizeUniversity(name, address);
+                showResult('⏳ Transaction submitted. Waiting for confirmation...', 'info', 'adminResults');
+                
+                const receipt = await tx.wait();
+                
+                showResult(`✅ University "${name}" added successfully!\\n📍 Address: ${address}\\n🧾 Transaction: ${receipt.transactionHash}`, 'success', 'adminResults');
+                updateStep(2, 'completed');
+                
+                document.getElementById('universityName').value = '';
+                document.getElementById('universityAddress').value = '';
+                
+                log(`University ${name} added successfully`, 'success');
+                
+            } catch (error) {
+                showResult(`❌ Add university failed: ${error.message}`, 'error', 'adminResults');
+                log(`Add university failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkUniversity() {
+            try {
+                if (!contract) {
+                    throw new Error('Please connect wallet first');
+                }
+                
+                const name = document.getElementById('checkUniversityName').value;
+                if (!name) {
+                    throw new Error('Please enter university name');
+                }
+                
+                const authorized = await contract.isUniversityAuthorized(name);
+                
+                const message = authorized ? 
+                    `✅ "${name}" is authorized to issue diplomas` : 
+                    `❌ "${name}" is not authorized`;
+                    
+                showResult(message, authorized ? 'success' : 'error', 'adminResults');
+                log(`University check: ${name} - ${authorized ? 'authorized' : 'not authorized'}`, 'info');
+                
+            } catch (error) {
+                showResult(`❌ Check failed: ${error.message}`, 'error', 'adminResults');
+                log(`University check failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // ============ UNIVERSITY FUNCTIONS ============
+        
+        async function issueDiploma() {
+            try {
+                if (!contract) {
+                    throw new Error('Please connect wallet first');
+                }
+                
+                const file = document.getElementById('diplomaFile').files[0];
+                const universityName = document.getElementById('issueUniversityName').value;
+                const degreeType = document.getElementById('degreeType').value;
+                
+                if (!file || !universityName) {
+                    throw new Error('Please provide PDF file and university name');
+                }
+                
+                const hash = await generateKeccakHash(file);
+                if (!hash) {
+                    throw new Error('Failed to generate Keccak-256 hash');
+                }
+                
+                document.getElementById('generatedHash').textContent = hash;
+                
+                const degreeTypeBytes32 = degreeType ? 
+                    ethers.utils.formatBytes32String(degreeType) : 
+                    ethers.constants.HashZero;
+                
+                showResult('🔄 Issuing diploma to blockchain...', 'info', 'universityResults');
+                
+                const tx = await contract.issueDiploma(hash, universityName, degreeTypeBytes32);
+                showResult('⏳ Transaction submitted. Waiting for confirmation...', 'info', 'universityResults');
+                
+                const receipt = await tx.wait();
+                
+                showResult(`✅ Diploma issued successfully to blockchain!\\n📄 File: ${file.name}\\n🔐 Hash: ${hash}\\n🏛️ University: ${universityName}\\n🎓 Degree: ${degreeType || 'Not specified'}\\n🧾 Transaction: ${receipt.transactionHash}`, 'success', 'universityResults');
+                updateStep(3, 'completed');
+                
+                log(`Diploma issued: ${file.name} by ${universityName}`, 'success');
+                
+            } catch (error) {
+                showResult(`❌ Issue diploma failed: ${error.message}`, 'error', 'universityResults');
+                log(`Issue diploma failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // ============ VERIFICATION FUNCTIONS ============
+        
+        async function verifyDiploma() {
+            try {
+                if (!contract) {
+                    throw new Error('Please connect wallet first');
+                }
+                
+                const file = document.getElementById('verifyFile').files[0];
+                const universityName = document.getElementById('verifyUniversityName').value;
+                
+                if (!file || !universityName) {
+                    throw new Error('Please provide PDF file and university name');
+                }
+                
+                const hash = await generateKeccakHash(file);
+                if (!hash) {
+                    throw new Error('Failed to generate Keccak-256 hash');
+                }
+                
+                document.getElementById('verificationHash').textContent = hash;
+                
+                showResult('🔍 Verifying diploma on blockchain...', 'info', 'verifyResults');
+                
+                const result = await contract.verifyDiploma(hash, universityName);
+                const [isValid, exists, issuer, issuedAt, revoked, degreeType] = result;
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `verification-result ${isValid ? 'verification-valid' : 'verification-invalid'}`;
+                
+                if (isValid) {
+                    const issueDate = new Date(issuedAt * 1000).toLocaleString();
+                    const degreeTypeStr = degreeType !== ethers.constants.HashZero ? 
+                        ethers.utils.parseBytes32String(degreeType) : 'Not specified';
+                    
+                    resultDiv.innerHTML = `
+                        <h4>✅ AUTHENTIC DIPLOMA - BLOCKCHAIN VERIFIED!</h4>
+                        <p><strong>Status:</strong> Valid and Authentic ✅</p>
+                        <p><strong>University:</strong> ${universityName}</p>
+                        <p><strong>Issuer Address:</strong> ${issuer}</p>
+                        <p><strong>Issue Date:</strong> ${issueDate}</p>
+                        <p><strong>Diploma Hash:</strong> ${hash}</p>
+                        <p><strong>Degree Type:</strong> ${degreeTypeStr}</p>
+                        <p><strong>Revoked:</strong> ${revoked ? 'Yes ❌' : 'No ✅'}</p>
+                        <p><strong>Blockchain Record:</strong> Exists ✅</p>
+                        <p><strong>Network:</strong> ${currentNetwork.name}</p>
+                        <p>🎯 This diploma is genuine and was issued by an authorized university on the blockchain!</p>
+                    `;
+                    updateStep(4, 'completed');
+                    log(`Diploma verified successfully: ${file.name}`, 'success');
+                } else {
+                    let reason = 'Unknown error';
+                    if (!exists) {
+                        reason = 'No record found on blockchain';
+                    } else if (revoked) {
+                        reason = 'Diploma has been revoked';
+                    } else {
+                        reason = 'Issued by unauthorized university or hash mismatch';
+                    }
+                    
+                    resultDiv.innerHTML = `
+                        <h4>❌ INVALID DIPLOMA - VERIFICATION FAILED!</h4>
+                        <p><strong>Status:</strong> Not Authentic ❌</p>
+                        <p><strong>Reason:</strong> ${reason}</p>
+                        <p><strong>Blockchain Record Exists:</strong> ${exists ? 'Yes' : 'No'}</p>
+                        <p><strong>Verification Hash:</strong> ${hash}</p>
+                        <p><strong>Network:</strong> ${currentNetwork.name}</p>
+                        <p>⚠️ This diploma cannot be verified as authentic on the blockchain.</p>
+                    `;
+                    log(`Diploma verification failed: ${reason}`, 'warning');
+                }
+                
+                const container = document.getElementById('verifyResults');
+                container.innerHTML = '';
+                container.appendChild(resultDiv);
+                
+            } catch (error) {
+                showResult(`❌ Verification failed: ${error.message}`, 'error', 'verifyResults');
+                log(`Verification failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // ============ DEBUG FUNCTIONS ============
+        
+        function toggleDebug() {
+            const debugInfo = document.getElementById('debugInfo');
+            if (debugInfo.style.display === 'none') {
+                debugInfo.style.display = 'block';
+            } else {
+                debugInfo.style.display = 'none';
+            }
+        }
+        
+        // ============ EVENT LISTENERS ============
+        
         document.getElementById('diplomaFile').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (file) {
                 const hash = await generateKeccakHash(file);
-                document.getElementById('generatedHash').textContent = hash || 'Keccak-256 hash generation failed';
+                document.getElementById('generatedHash').textContent = hash || 'Hash generation failed';
+                log(`Generated hash for ${file.name}: ${hash}`, 'info');
             }
         });
         
@@ -584,30 +1073,66 @@
             const file = e.target.files[0];
             if (file) {
                 const hash = await generateKeccakHash(file);
-                document.getElementById('verificationHash').textContent = hash || 'Keccak-256 hash generation failed';
+                document.getElementById('verificationHash').textContent = hash || 'Hash generation failed';
+                log(`Generated verification hash for ${file.name}: ${hash}`, 'info');
             }
         });
         
-        // Test Keccak-256 library on load
-        window.addEventListener('load', () => {
+        // ============ INITIALIZATION ============
+        
+        window.addEventListener('load', async () => {
+            log('🎓 Diploma Verification System - Production Ready!', 'info');
             updateConnectionStatus(false, 'Click Connect MetaMask to start');
-            console.log('Diploma Verification System Loaded - FIXED VERSION!');
             
             // Test Keccak-256 library
             try {
                 const testHash = keccak256('test');
-                console.log('✅ Keccak-256 library working! Test hash:', testHash);
-                console.log('🎯 Now using correct Ethereum-compatible hashing!');
+                log(`✅ Keccak-256 library working! Test hash: ${testHash}`, 'success');
             } catch (error) {
-                console.error('❌ Keccak-256 library error:', error);
+                log(`❌ Keccak-256 library error: ${error.message}`, 'error');
                 showResult('⚠️ Keccak-256 library failed to load. Please refresh the page.', 'error');
             }
             
-            // Check if MetaMask is installed
+            // Check MetaMask
             if (typeof window.ethereum === 'undefined') {
                 showResult('⚠️ MetaMask not detected. Please install MetaMask to use this application.', 'error');
+            } else {
+                showResult('🦊 MetaMask detected! Select your target network and click "Connect MetaMask".', 'info');
             }
+            
+            // Load contract info
+            await loadContractInfo();
+            
+            // Set default network in selector
+            document.getElementById('networkSelector').value = targetNetwork;
+            
+            log('Application initialized successfully', 'success');
         });
+        
+        // Listen for network changes
+        if (window.ethereum) {
+            window.ethereum.on('chainChanged', async (chainId) => {
+                log(`Network changed to chain ID: ${chainId}`, 'info');
+                await loadContractInfo();
+                
+                // Reconnect if wallet was connected
+                if (userAccount) {
+                    await connectWallet();
+                }
+            });
+            
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    log('MetaMask disconnected', 'warning');
+                    updateConnectionStatus(false, 'MetaMask disconnected');
+                    userAccount = null;
+                    contract = null;
+                } else if (accounts[0] !== userAccount) {
+                    log(`Account changed to: ${accounts[0]}`, 'info');
+                    connectWallet();
+                }
+            });
+        }
     </script>
 </body>
 </html>
