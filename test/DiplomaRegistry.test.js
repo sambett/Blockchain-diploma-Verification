@@ -1,11 +1,12 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+import { expect } from "chai";
+import pkg from "hardhat";
+const { ethers } = pkg;
 
 describe("DiplomaRegistry", function () {
   let diplomaRegistry;
   let admin, university1, university2, student, verifier;
   let universityName = "Test University";
-  let diplomaHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("sample-diploma-content"));
+  let diplomaHash = ethers.keccak256(ethers.toUtf8Bytes("sample-diploma-content"));
 
   beforeEach(async function () {
     // Get signers
@@ -14,7 +15,7 @@ describe("DiplomaRegistry", function () {
     // Deploy contract
     const DiplomaRegistry = await ethers.getContractFactory("DiplomaRegistry");
     diplomaRegistry = await DiplomaRegistry.deploy();
-    await diplomaRegistry.deployed();
+    await diplomaRegistry.waitForDeployment();
   });
 
   describe("Deployment", function () {
@@ -74,15 +75,19 @@ describe("DiplomaRegistry", function () {
     });
 
     it("Should emit DiplomaIssued event", async function () {
-      await expect(
-        diplomaRegistry.connect(university1).issueDiploma(
-          diplomaHash,
-          universityName,
-          "STUDENT123",
-          "Bachelor of Computer Science"
-        )
-      ).to.emit(diplomaRegistry, "DiplomaIssued")
-        .withArgs(diplomaHash, universityName);
+      const tx = await diplomaRegistry.connect(university1).issueDiploma(
+        diplomaHash,
+        universityName,
+        "STUDENT123",
+        "Bachelor of Computer Science"
+      );
+      
+      const receipt = await tx.wait();
+      const block = await ethers.provider.getBlock(receipt.blockNumber);
+      
+      await expect(tx)
+        .to.emit(diplomaRegistry, "DiplomaIssued")
+        .withArgs(diplomaHash, universityName, block.timestamp);
     });
 
     it("Should not allow unauthorized address to issue diploma", async function () {
@@ -137,7 +142,7 @@ describe("DiplomaRegistry", function () {
     });
 
     it("Should not verify non-existent diploma", async function () {
-      const fakeHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("fake-diploma"));
+      const fakeHash = ethers.keccak256(ethers.toUtf8Bytes("fake-diploma"));
       const isAuthentic = await diplomaRegistry.verifyDiploma(fakeHash, universityName);
       expect(isAuthentic).to.be.false;
     });

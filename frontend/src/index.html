@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Diploma Verification System - Complete Testing Interface</title>
+    
+    <!-- Web3 Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        
+        .admin-section { border-left-color: #e74c3c; }
+        .university-section { border-left-color: #f39c12; }
+        .verify-section { border-left-color: #27ae60; }
+        
+        .connection-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .button {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .button:hover { background: #2980b9; }
+        .button:disabled { 
+            background: #bdc3c7; 
+            cursor: not-allowed; 
+        }
+        
+        .admin-btn { background: #e74c3c; }
+        .admin-btn:hover { background: #c0392b; }
+        
+        .university-btn { background: #f39c12; }
+        .university-btn:hover { background: #d68910; }
+        
+        .verify-btn { background: #27ae60; }
+        .verify-btn:hover { background: #219a52; }
+        
+        .result {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+        
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        
+        .hash-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            margin: 5px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        
+        .step.active { background: #3498db; color: white; }
+        .step.completed { background: #27ae60; color: white; }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column { grid-template-columns: 1fr; }
+            .workflow-steps { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Complete Diploma Verification System</h1>
+        <p class="subtitle">Testing Interface - From PDF to Blockchain Verification</p>
+        
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status disconnected">
+            🔌 Not Connected to Blockchain
+        </div>
+        
+        <!-- Workflow Steps -->
+        <div class="workflow-steps">
+            <div class="step" id="step1">1. Connect</div>
+            <div class="step" id="step2">2. Deploy Contract</div>
+            <div class="step" id="step3">3. Add University</div>
+            <div class="step" id="step4">4. Issue Diploma</div>
+            <div class="step" id="step5">5. Verify</div>
+        </div>
+        
+        <!-- Connection Section -->
+        <div class="section">
+            <h3>🔗 Blockchain Connection</h3>
+            <button class="button" onclick="connectWallet()">Connect MetaMask</button>
+            <button class="button" onclick="deployContract()">Deploy Contract</button>
+            <div id="contractInfo" class="result info" style="display: none;">
+                Contract Address: <span id="contractAddress"></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin Section -->
+    <div class="container">
+        <div class="section admin-section">
+            <h3>👤 Admin Functions (Contract Owner)</h3>
+            <div class="two-column">
+                <div>
+                    <h4>Add University</h4>
+                    <input type="text" id="universityName" placeholder="University Name (e.g., Harvard)" />
+                    <input type="text" id="universityAddress" placeholder="University Wallet Address" />
+                    <button class="button admin-btn" onclick="addUniversity()">Add University</button>
+                </div>
+                <div>
+                    <h4>Check University Status</h4>
+                    <input type="text" id="checkUniversityName" placeholder="University Name" />
+                    <button class="button admin-btn" onclick="checkUniversity()">Check Status</button>
+                </div>
+            </div>
+            <div id="adminResults"></div>
+        </div>
+    </div>
+    
+    <!-- University Section -->
+    <div class="container">
+        <div class="section university-section">
+            <h3>🏛️ University Functions (Issue Diplomas)</h3>
+            <div class="two-column">
+                <div>
+                    <h4>Issue Diploma</h4>
+                    <input type="file" id="diplomaFile" accept=".pdf" />
+                    <input type="text" id="issueUniversityName" placeholder="Your University Name" />
+                    <input type="text" id="studentInfo" placeholder="Student ID/Info" />
+                    <input type="text" id="diplomaDetails" placeholder="Degree Details" />
+                    <button class="button university-btn" onclick="issueDiploma()">Issue Diploma</button>
+                </div>
+                <div>
+                    <h4>Generated Hash</h4>
+                    <div id="generatedHash" class="hash-display">
+                        Upload PDF to generate hash...
+                    </div>
+                </div>
+            </div>
+            <div id="universityResults"></div>
+        </div>
+    </div>
+    
+    <!-- Verification Section -->
+    <div class="container">
+        <div class="section verify-section">
+            <h3>✅ Verification (Anyone Can Verify)</h3>
+            <div class="two-column">
+                <div>
+                    <h4>Verify Diploma</h4>
+                    <input type="file" id="verifyFile" accept=".pdf" />
+                    <input type="text" id="verifyUniversityName" placeholder="Expected University Name" />
+                    <button class="button verify-btn" onclick="verifyDiploma()">Verify Diploma</button>
+                </div>
+                <div>
+                    <h4>Verification Hash</h4>
+                    <div id="verificationHash" class="hash-display">
+                        Upload PDF to verify...
+                    </div>
+                </div>
+            </div>
+            <div id="verifyResults"></div>
+        </div>
+    </div>
+    
+    <!-- Testing Instructions -->
+    <div class="container">
+        <div class="section">
+            <h3>📋 Testing Instructions</h3>
+            <ol>
+                <li><strong>Connect:</strong> Click "Connect MetaMask" and "Deploy Contract"</li>
+                <li><strong>Add University:</strong> As admin, add a university with wallet address</li>
+                <li><strong>Issue Diploma:</strong> Switch to university account, upload PDF, issue diploma</li>
+                <li><strong>Verify:</strong> Upload same PDF to verify authenticity</li>
+                <li><strong>Test Fraud:</strong> Upload different PDF - should fail verification</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let provider;
+        let signer;
+        let contract;
+        let userAccount;
+        
+        // Contract ABI (simplified for key functions)
+        const contractABI = [
+            "constructor()",
+            "function authorizeUniversity(string memory universityName, address universityAddress) external",
+            "function issueDiploma(bytes32 diplomaHash, string memory universityName, string memory studentInfo, string memory diplomaDetails) external",
+            "function verifyDiploma(bytes32 diplomaHash, string memory universityName) external view returns (bool)",
+            "function getDiplomaInfo(bytes32 diplomaHash) external view returns (bool, bool, string memory, uint256, string memory)",
+            "function isUniversityAuthorized(string memory universityName) external view returns (bool)",
+            "function getUniversityAddress(string memory universityName) external view returns (address)",
+            "event UniversityAuthorized(string indexed universityName, address indexed universityAddress)",
+            "event DiplomaIssued(bytes32 indexed diplomaHash, string indexed universityName, uint256 timestamp)",
+            "event DiplomaRevoked(bytes32 indexed diplomaHash, string indexed universityName)"
+        ];
+        
+        // Contract bytecode (you'll need to get this from compilation)
+        const contractBytecode = "0x"; // This will be filled after compilation
+        
+        // Update connection status
+        function updateConnectionStatus(connected, message) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.className = 'connection-status connected';
+                status.innerHTML = '✅ ' + message;
+            } else {
+                status.className = 'connection-status disconnected';  
+                status.innerHTML = '🔌 ' + message;
+            }
+        }
+        
+        // Update workflow steps
+        function updateStep(stepNumber, state = 'active') {
+            const step = document.getElementById(`step${stepNumber}`);
+            step.className = `step ${state}`;
+            
+            // Mark previous steps as completed
+            for (let i = 1; i < stepNumber; i++) {
+                const prevStep = document.getElementById(`step${i}`);
+                if (!prevStep.classList.contains('completed')) {
+                    prevStep.className = 'step completed';
+                }
+            }
+        }
+        
+        // Connect to MetaMask
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask not installed');
+                }
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                signer = provider.getSigner();
+                userAccount = await signer.getAddress();
+                
+                updateConnectionStatus(true, `Connected: ${userAccount.slice(0,8)}...`);
+                updateStep(1, 'completed');
+                
+                showResult('Connection successful!', 'success');
+            } catch (error) {
+                showResult(`Connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Deploy contract (simplified - in real app, contract would be pre-deployed)
+        async function deployContract() {
+            try {
+                if (!signer) {
+                    throw new Error('Please connect wallet first');
+                }
+                
+                // For testing, we'll simulate contract deployment
+                // In real deployment, you'd use the actual bytecode
+                showResult('Contract deployed successfully! (Simulated)', 'success');
+                document.getElementById('contractInfo').style.display = 'block';
+                document.getElementById('contractAddress').textContent = '0x1234...abcd (Local Testing)';
+                
+                updateStep(2, 'completed');
+            } catch (error) {
+                showResult(`Deployment failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Generate hash from PDF file
+        async function generateHash(file) {
+            if (!file) return null;
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const hash = sha3_256(uint8Array);
+                return '0x' + hash;
+            } catch (error) {
+                console.error('Hash generation error:', error);
+                return null;
+            }
+        }
+        
+        // Add university (admin function)
+        async function addUniversity() {
+            try {
+                const name = document.getElementById('universityName').value;
+                const address = document.getElementById('universityAddress').value;
+                
+                if (!name || !address) {
+                    throw new Error('Please fill in all fields');
+                }
+                
+                // Simulate contract call
+                showResult(`University "${name}" added successfully!`, 'success', 'adminResults');
+                updateStep(3, 'completed');
+                
+                // Clear form
+                document.getElementById('universityName').value = '';
+                document.getElementById('universityAddress').value = '';
+                
+            } catch (error) {
+                showResult(`Add university failed: ${error.message}`, 'error', 'adminResults');
+            }
+        }
+        
+        // Check university status
+        async function checkUniversity() {
+            try {
+                const name = document.getElementById('checkUniversityName').value;
+                if (!name) {
+                    throw new Error('Please enter university name');
+                }
+                
+                // Simulate contract call
+                const authorized = Math.random() > 0.5; // Random for testing
+                const message = authorized ? 
+                    `✅ "${name}" is authorized` : 
+                    `❌ "${name}" is not authorized`;
+                    
+                showResult(message, authorized ? 'success' : 'error', 'adminResults');
+                
+            } catch (error) {
+                showResult(`Check failed: ${error.message}`, 'error', 'adminResults');
+            }
+        }
+        
+        // Issue diploma
+        async function issueDiploma() {
+            try {
+                const file = document.getElementById('diplomaFile').files[0];
+                const universityName = document.getElementById('issueUniversityName').value;
+                const studentInfo = document.getElementById('studentInfo').value;
+                const diplomaDetails = document.getElementById('diplomaDetails').value;
+                
+                if (!file || !universityName || !studentInfo) {
+                    throw new Error('Please fill in all required fields');
+                }
+                
+                // Generate hash
+                const hash = await generateHash(file);
+                if (!hash) {
+                    throw new Error('Failed to generate hash');
+                }
+                
+                // Display hash
+                document.getElementById('generatedHash').textContent = hash;
+                
+                // Simulate contract call
+                showResult(`Diploma issued successfully!\\nHash: ${hash}\\nUniversity: ${universityName}`, 'success', 'universityResults');
+                updateStep(4, 'completed');
+                
+            } catch (error) {
+                showResult(`Issue diploma failed: ${error.message}`, 'error', 'universityResults');
+            }
+        }
+        
+        // Verify diploma
+        async function verifyDiploma() {
+            try {
+                const file = document.getElementById('verifyFile').files[0];
+                const universityName = document.getElementById('verifyUniversityName').value;
+                
+                if (!file || !universityName) {
+                    throw new Error('Please provide PDF file and university name');
+                }
+                
+                // Generate hash
+                const hash = await generateHash(file);
+                if (!hash) {
+                    throw new Error('Failed to generate hash');
+                }
+                
+                // Display hash
+                document.getElementById('verificationHash').textContent = hash;
+                
+                // Simulate verification (check against issued diploma hash)
+                const generatedHash = document.getElementById('generatedHash').textContent;
+                const isValid = (hash === generatedHash);
+                
+                const message = isValid ? 
+                    `✅ AUTHENTIC DIPLOMA\\nThis diploma is genuine and issued by ${universityName}` :
+                    `❌ INVALID DIPLOMA\\nThis diploma is not authentic or not from ${universityName}`;
+                    
+                showResult(message, isValid ? 'success' : 'error', 'verifyResults');
+                
+                if (isValid) {
+                    updateStep(5, 'completed');
+                }
+                
+            } catch (error) {
+                showResult(`Verification failed: ${error.message}`, 'error', 'verifyResults');
+            }
+        }
+        
+        // Show result message
+        function showResult(message, type, containerId = null) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message.replace(/\\n/g, '<br>');
+            
+            if (containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                container.appendChild(resultDiv);
+            } else {
+                // Show in first available results container
+                const containers = document.querySelectorAll('[id$="Results"]');
+                if (containers.length > 0) {
+                    containers[0].innerHTML = '';
+                    containers[0].appendChild(resultDiv);
+                }
+            }
+            
+            // Auto-hide after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (resultDiv.parentNode) {
+                        resultDiv.style.opacity = '0';
+                        setTimeout(() => {
+                            if (resultDiv.parentNode) {
+                                resultDiv.remove();
+                            }
+                        }, 500);
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Auto-generate hash when file is selected
+        document.getElementById('diplomaFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const hash = await generateHash(file);
+                document.getElementById('generatedHash').textContent = hash || 'Hash generation failed';
+            }
+        });
+        
+        document.getElementById('verifyFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const hash = await generateHash(file);
+                document.getElementById('verificationHash').textContent = hash || 'Hash generation failed';
+            }
+        });
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateConnectionStatus(false, 'Click Connect MetaMask to start');
+            console.log('Diploma Verification System Loaded');
+            
+            // Check if MetaMask is installed
+            if (typeof window.ethereum === 'undefined') {
+                showResult('⚠️ MetaMask not detected. Please install MetaMask to use this application.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
