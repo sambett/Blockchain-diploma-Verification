@@ -1,347 +1,324 @@
-# 🎓 Blockchain Diploma Verification System
+# 🎓 Diploma Verification System
 
-**A complete, production-ready decentralized application for certifying and verifying academic diplomas using blockchain technology.**
+> **Production-Ready Blockchain Application for Diploma Authentication**
 
-[![Tests](https://img.shields.io/badge/tests-30%20passing-brightgreen)](./test/)
-[![Smart Contract](https://img.shields.io/badge/smart%20contract-deployed-blue)](./contracts/)
-[![Frontend](https://img.shields.io/badge/frontend-production%20ready-success)](./frontend/)
-[![Network](https://img.shields.io/badge/networks-localhost%20%7C%20sepolia-yellow)](./hardhat.config.js)
+A decentralized diploma verification system built on Ethereum that allows universities to issue verifiable diplomas and enables instant verification by employers, institutions, or individuals.
 
-## 🚀 **QUICK START - 5 MINUTE DEMO**
+[![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?logo=ethereum&logoColor=white)](https://ethereum.org/)
+[![Solidity](https://img.shields.io/badge/Solidity-363636?logo=solidity&logoColor=white)](https://soliditylang.org/)
+[![Hardhat](https://img.shields.io/badge/Hardhat-FFF100?logo=hardhat&logoColor=black)](https://hardhat.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### **⚡ Want to see it working immediately?**
+## 🌟 **Key Features**
 
-1. **📖 [QUICK DEMO GUIDE](./QUICK_DEMO.md)** - Complete 5-minute setup
-2. **🦊 [METAMASK SETUP](./METAMASK_SETUP.md)** - Network configuration guide  
-3. **🔧 Environment setup:** Copy `.env.example` to `.env` and add your private key
+- ✅ **Instant Verification** - Verify any diploma in under 2 seconds
+- 🏛️ **University Management** - Authorized universities can issue diplomas on-chain
+- 🔐 **Cryptographic Security** - Uses Keccak-256 hashing for tamper-proof records
+- 🌐 **Multi-Network Support** - Deploy on localhost, Sepolia testnet, or mainnet
+- 📱 **MetaMask Integration** - Seamless wallet connection and transaction signing
+- 🔒 **Access Control** - Role-based permissions with OpenZeppelin contracts
+- 💰 **Gas Optimized** - Minimal storage and efficient operations
 
+## 🚀 **Quick Start**
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- [MetaMask](https://metamask.io/) browser extension
+- [Git](https://git-scm.com/)
+
+### Installation
 ```bash
-# 1. Quick setup
-npm install
-cp .env.example .env
-# Add your private key to .env
+# Clone the repository
+git clone <your-repo-url>
+cd diploma_verif
 
-# 2. Start local blockchain
-npm run node
+# Install dependencies
+npm run setup
 
-# 3. Deploy (new terminal)
-npm run deploy:local
-
-# 4. Open frontend
-start frontend/src/index.html
+# Start local development
+npm run dev
 ```
 
-**🎯 That's it! Your diploma verification system is running!**
+This will:
+1. Start a local Hardhat node on `http://127.0.0.1:8545`
+2. Deploy the contract locally
+3. Launch the frontend application
 
----
-
-## 🎯 Project Overview
-
-This system provides a complete diploma verification solution:
-- **🏛️ Universities**: Register and issue diploma certificates securely
-- **🎓 Students**: Get diplomas certified immutably on blockchain  
-- **🔍 Employers/Verifiers**: Verify diploma authenticity instantly
-- **🔒 Privacy-First**: Only diploma hashes stored on-chain (not actual PDFs)
-
-## 🏗️ System Architecture
-
-```
-PDF Upload → Keccak-256 Hash → Smart Contract → Blockchain Storage
-                ↓
-Verification Interface ← Hash Comparison ← University Authorization
-```
-
-**Key Innovation**: Only cryptographic hashes of diplomas are stored on-chain, ensuring privacy while enabling instant verification.
-
-## 🌐 **MetaMask Network Configuration**
-
-### **🏠 Localhost (Development)**
-```
-Network Name: Localhost
-RPC URL: http://127.0.0.1:8545
-Chain ID: 31337
-Currency Symbol: ETH
-```
-
-### **🌍 Sepolia Testnet (Public Demo)**
-```
-Network Name: Sepolia Testnet  
-RPC URL: https://eth-sepolia.g.alchemy.com/v2/AAYo6M97q2EH6ob8ohhYg
-Chain ID: 11155111
-Currency Symbol: ETH
-```
-
-**📱 Detailed setup:** See [METAMASK_SETUP.md](./METAMASK_SETUP.md)
-
-## 🚀 Production Status
-
-### ✅ **Currently Deployed & Working**
-- **Smart Contract**: `DiplomaRegistry.sol` with full functionality
-- **Local Network**: Ready to deploy at localhost:8545
-- **Sepolia Testnet**: Configured and ready
-- **Frontend**: Production-ready web application  
-- **Tests**: 30 comprehensive tests - all passing ✅
-
-### 🌐 **Network Support**
-- **Localhost** (Development): ✅ Ready
-- **Sepolia Testnet**: ✅ Configured (deploy with `npm run deploy:sepolia`)
-- **Ethereum Mainnet**: 🔧 Configurable
-
-## 📱 **Feature Showcase**
-
-### **For Administrators**
-- ✅ Authorize universities to issue diplomas
-- ✅ Revoke university permissions
-- ✅ Monitor system activity through events
-
-### **For Universities** 
-- ✅ Upload PDF diplomas → Generate secure hashes
-- ✅ Issue diplomas to blockchain with metadata
-- ✅ Revoke diplomas if necessary
-- ✅ Verify authorization status
-
-### **For Verifiers (Public)**
-- ✅ Upload any PDF diploma
-- ✅ Enter expected university name
-- ✅ Get instant authenticity verification
-- ✅ View detailed diploma information
-
-## 🛠️ Tech Stack
-
-| Component | Technology | Status |
-|-----------|------------|--------|
-| **Smart Contracts** | Solidity ^0.8.24 | ✅ Production Ready |
-| **Blockchain** | Ethereum (Hardhat) | ✅ Configured |
-| **Frontend** | HTML/CSS/JS + Ethers.js | ✅ Production Ready |
-| **Wallet** | MetaMask Integration | ✅ Fully Integrated |
-| **Testing** | Hardhat + Chai | ✅ 30 Tests Passing |
-| **Security** | OpenZeppelin Contracts | ✅ Implemented |
-| **Hashing** | Keccak-256 (Web3 Standard) | ✅ Client-side |
-
-## 📁 Project Structure
+## 🏗️ **Project Structure**
 
 ```
 diploma_verif/
-├── 📄 contracts/
-│   ├── DiplomaRegistry.sol      # Main smart contract (production-ready)
-│   └── README.md                # Contract documentation
-├── 🧪 test/
-│   └── DiplomaRegistry.test.js  # Comprehensive test suite (30 tests)
-├── 🚀 ignition/
-│   └── modules/Deploy.js        # Hardhat Ignition deployment
-├── 🌐 frontend/
-│   └── src/index.html           # Production-ready web interface
-├── 📚 docs/
-│   └── README.md                # Technical documentation
-├── 📖 QUICK_DEMO.md             # 5-minute setup guide
-├── 🦊 METAMASK_SETUP.md         # MetaMask configuration guide
-├── ⚙️ hardhat.config.js         # Network configuration
-├── 📦 package.json              # Project dependencies & scripts
-└── 🔐 .env.example              # Environment template
+├── contracts/              # Smart contracts
+│   └── DiplomaRegistry.sol     # Main verification contract
+├── test/                   # Contract tests
+│   └── DiplomaRegistry.test.js # Comprehensive test suite
+├── ignition/modules/       # Deployment scripts
+│   └── Deploy.js              # Contract deployment
+├── frontend/               # Frontend application
+│   └── src/
+│       └── index.html         # Single-page application
+├── docs/                   # Documentation
+├── .env                    # Environment configuration
+└── hardhat.config.js       # Hardhat configuration
 ```
 
-## 🎮 **Complete Demo Workflow**
+## 🔗 **Network Configuration**
 
-### **🎯 Live Demo Steps (5 minutes):**
+### Local Development (Default)
+- **Network**: Localhost  
+- **Chain ID**: 31337
+- **RPC URL**: `http://127.0.0.1:8545`
+- **Contract**: Auto-deployed on startup
 
-1. **⚙️ Environment Setup** (30 sec)
-   ```bash
-   cp .env.example .env
-   # Add your private key to .env
+### Sepolia Testnet
+- **Chain ID**: 11155111  
+- **RPC URL**: Alchemy endpoint (in `.env`)
+- **Faucet**: [Sepolia Faucet](https://sepoliafaucet.com/)
+
+## 🦊 **MetaMask Setup Guide**
+
+### 1. Install MetaMask
+1. Install [MetaMask extension](https://metamask.io/download/)
+2. Create or import a wallet
+3. Secure your seed phrase
+
+### 2. Add Local Network (Development)
+1. Open MetaMask settings
+2. Navigate to **Networks** → **Add Network**
+3. **Add Manually** with these details:
+   ```
+   Network Name: Hardhat Local
+   New RPC URL: http://127.0.0.1:8545
+   Chain ID: 31337
+   Currency Symbol: GO
    ```
 
-2. **🔗 MetaMask Configuration** (1 min)
-   - Add Localhost network (Chain ID: 31337)
-   - Or use Sepolia testnet (Chain ID: 11155111)
-   - Get testnet ETH if using Sepolia
+### 3. Import Test Account (Development)
+1. Copy a private key from Hardhat's startup output
+2. MetaMask → **Import Account** → Paste private key
+3. You now have 10,000 ETH for testing!
 
-3. **🚀 Deploy & Launch** (1 min)
-   ```bash
-   npm run node          # Start blockchain
-   npm run deploy:local  # Deploy contracts
-   start frontend/src/index.html  # Open app
+### 4. Add Sepolia Testnet
+1. MetaMask → **Networks** → **Add Network**  
+2. Select **Sepolia** from popular networks
+3. Get test ETH from [Sepolia Faucet](https://sepoliafaucet.com/)
+
+## 📋 **How to Use**
+
+### 👤 **Admin Setup** (First Time Only)
+1. Connect MetaMask with admin account
+2. Add universities using the **Admin Panel**:
+   ```
+   University Name: "Harvard University"
+   Address: 0x742d35Cc662C...
    ```
 
-4. **👤 Admin Setup** (30 sec)
-   - Connect MetaMask → Add University → Authorize
+### 🏛️ **Issue a Diploma** (Universities)
+1. Connect with authorized university wallet
+2. Upload diploma PDF file
+3. Enter university name and degree type
+4. Click **Issue Diploma** → Sign transaction
+5. Diploma hash is permanently stored on blockchain
 
-5. **🏛️ University Issues Diploma** (1 min)
-   - Upload PDF → Generate Hash → Add Metadata → Issue to Blockchain
-
-6. **✅ Verify Diploma** (1 min)
-   - Upload Same PDF → Enter University → Get Verification Result
-
-### **🎯 Example Verification Result:**
-```
-✅ AUTHENTIC DIPLOMA - BLOCKCHAIN VERIFIED!
-🏛️ University: Harvard University
-📅 Issue Date: 2024-09-09
-🎓 Degree Type: BACHELOR_CS
-🔐 Hash: 0x1234...abcd
-⛓️ Network: Sepolia Testnet
-```
+### ✅ **Verify a Diploma** (Anyone)
+1. Upload the diploma PDF to verify
+2. Enter the expected university name  
+3. Click **Verify Diploma**
+4. Get instant **Authentic ✅** or **Invalid ❌** result
 
 ## 🧪 **Testing**
 
-Our comprehensive test suite covers all scenarios:
-
+### Run Contract Tests
 ```bash
 npm test
 ```
 
-**Test Results:**
-```
-✅ 30 tests passing
-✅ Deployment & Access Control
-✅ University Authorization  
-✅ Diploma Issuance
-✅ Diploma Verification
-✅ Diploma Revocation
-✅ Security & Edge Cases
-```
-
-## 🌐 **Deployment Guide**
-
-### **🏠 Local Development**
+### Run Local Node
 ```bash
-npm run node          # Start local blockchain
-npm run deploy:local  # Deploy contracts
+npm run node
 ```
 
-### **🌍 Sepolia Testnet**
+### Deploy Contracts
 ```bash
-# 1. Configure environment
-cp .env.example .env
-# Add private key to .env
+# Local deployment
+npm run deploy:local
 
-# 2. Get Sepolia ETH from faucet
-# Visit: https://sepoliafaucet.com/
-
-# 3. Deploy to Sepolia
+# Sepolia deployment  
 npm run deploy:sepolia
 ```
 
-### **🚀 Production (Mainnet)**
-- Update `hardhat.config.js` with mainnet configuration
-- Ensure sufficient ETH for deployment gas costs
-- Run security audit before mainnet deployment
+## 🔧 **Development**
 
-## 🔒 **Security Features**
+### Smart Contract Development
+```bash
+# Compile contracts
+npm run compile
 
-- **✅ Access Control**: Role-based permissions (Admin/University)
-- **✅ Reentrancy Guard**: Protection against reentrancy attacks
-- **✅ Input Validation**: Comprehensive parameter checking
-- **✅ OpenZeppelin Standards**: Industry-standard security contracts
-- **✅ Hash Verification**: Cryptographic diploma verification
-- **✅ Event Logging**: Transparent on-chain activity logs
+# Run tests with coverage
+npm run test
 
-## 🔑 **Private Key Requirements**
+# Deploy to network
+npm run deploy:local
+```
 
-For contract deployment, you need a private key:
+### Frontend Development
+```bash
+# Start frontend only
+npm run frontend:start
 
-### **🦊 Get from MetaMask:**
-1. MetaMask → Account Details → Show Private Key
-2. Copy key and add to `.env` file
-3. **⚠️ TESTNET ONLY - Never share mainnet keys!**
+# Build for production
+npm run frontend:build
+```
 
-### **💰 Get Testnet ETH:**
-- **Sepolia**: https://sepoliafaucet.com/
-- **Alternative**: https://sepolia-faucet.pk910.de/
+## 📊 **Smart Contract Details**
+
+### DiplomaRegistry.sol
+- **Access Control**: Role-based permissions (Admin, University)
+- **Gas Optimized**: Uses `uint64` for timestamps, `bytes32` for hashes
+- **Security**: ReentrancyGuard, input validation
+- **Privacy**: Only stores hash, not diploma content
+
+### Key Functions
+```solidity
+// Admin functions
+authorizeUniversity(string name, address wallet)
+revokeUniversityAuthorization(string name)
+
+// University functions  
+issueDiploma(bytes32 hash, string university, bytes32 degreeType)
+revokeDiploma(bytes32 hash, string university)
+
+// Public verification
+verifyDiploma(bytes32 hash, string university)
+isUniversityAuthorized(string university)
+```
+
+## 🔐 **Security Features**
+
+- **Cryptographic Hashing**: Keccak-256 ensures data integrity
+- **Access Control**: OpenZeppelin role-based permissions
+- **Reentrancy Protection**: Secure against common attacks
+- **Input Validation**: Comprehensive parameter checking
+- **Privacy by Design**: No personal data stored on-chain
+
+## 🌐 **Deployment Guide**
+
+### Local Deployment
+```bash
+# Terminal 1: Start local node
+npm run node
+
+# Terminal 2: Deploy contract
+npm run deploy:local
+
+# Terminal 3: Start frontend
+npm run frontend:start
+```
+
+### Sepolia Deployment
+1. Configure `.env` with your private key:
+   ```env
+   PRIVATE_KEY=your_private_key_here
+   SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/your_key
+   ```
+2. Deploy to Sepolia:
+   ```bash
+   npm run deploy:sepolia
+   ```
+3. Update contract address in frontend
+
+## 🐛 **Troubleshooting**
+
+### Common Issues
+
+**MetaMask Connection Failed**
+- Ensure MetaMask is unlocked
+- Check network matches application
+- Refresh page and reconnect
+
+**Transaction Failed**
+- Check you have enough ETH for gas
+- Verify you're using correct network
+- Ensure wallet is authorized for action
+
+**Diploma Verification Failed**
+- PDF must be exact same file used for issuance
+- University name must match exactly
+- Check university is authorized
+
+**Hash Generation Error**
+- Ensure PDF file is valid and not corrupted
+- Try refreshing page and uploading again
+- Check browser console for errors
+
+### Getting Help
+1. Check [Issues](link-to-issues) for known problems
+2. Review contract events in MetaMask
+3. Check browser console for errors
+4. Verify network and contract addresses
+
+## 📄 **Environment Configuration**
+
+### `.env` File Template
+```env
+# Sepolia Testnet Configuration
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
+PRIVATE_KEY=your_private_key_without_0x
+
+# Optional: Custom configuration
+NETWORK_NAME=sepolia
+CHAIN_ID=11155111
+```
 
 ## 🤝 **Contributing**
 
-### **Git Workflow**
-```bash
-# Create feature branch
-git checkout -b feature/your-feature
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Run tests (`npm test`)
+4. Commit changes (`git commit -m 'Add amazing feature'`)
+5. Push to branch (`git push origin feature/amazing-feature`)
+6. Open Pull Request
 
-# Make changes and test
-npm test
+## 📜 **License**
 
-# Commit and push
-git add .
-git commit -m "Add: your feature description"
-git push origin feature/your-feature
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# Create Pull Request
+## 🎯 **Technical Stack**
+
+- **Blockchain**: Ethereum, Solidity ^0.8.24
+- **Development**: Hardhat, Ethers.js v5
+- **Frontend**: Vanilla HTML/CSS/JavaScript
+- **Security**: OpenZeppelin Contracts
+- **Testing**: Hardhat Test Runner, Chai
+- **Networks**: Localhost, Sepolia Testnet
+
+## 📈 **Roadmap**
+
+- [x] Core smart contract functionality
+- [x] MetaMask integration  
+- [x] PDF hash verification
+- [x] Multi-network support
+- [ ] IPFS integration for diploma storage
+- [ ] Mobile app development
+- [ ] Bulk diploma issuance
+- [ ] Advanced analytics dashboard
+
+## 🔍 **Architecture**
+
+```mermaid
+graph TD
+    A[User Uploads PDF] --> B[Generate Keccak-256 Hash]
+    B --> C{Action Type?}
+    C -->|Issue| D[University Signs Transaction]
+    C -->|Verify| E[Query Blockchain]
+    D --> F[Store Hash On-Chain]
+    E --> G{Hash Exists?}
+    G -->|Yes| H[✅ Authentic]
+    G -->|No| I[❌ Invalid]
 ```
-
-### **Development Guidelines**
-- ✅ All tests must pass before merging
-- ✅ Gas optimization for smart contracts
-- ✅ Comprehensive error handling
-- ✅ Update documentation for new features
-
-## 📚 **Documentation Links**
-
-- **📖 [Quick Demo Guide](./QUICK_DEMO.md)** - 5-minute setup
-- **🦊 [MetaMask Setup](./METAMASK_SETUP.md)** - Network configuration
-- **📋 [Smart Contract Docs](./contracts/README.md)** - Technical details
-- **🌐 [Frontend Guide](./frontend/README.md)** - UI documentation
-- **🧪 [Testing Guide](./test/README.md)** - Test documentation
-
-## 🚀 **What's Next?**
-
-Your system is **production-ready**! Consider these enhancements:
-
-- **🔄 Batch Operations**: Issue multiple diplomas simultaneously
-- **📊 Analytics Dashboard**: University dashboard with statistics
-- **🔗 API Endpoints**: REST API for enterprise integration
-- **📱 Mobile App**: React Native mobile application
-- **🏷️ QR Codes**: Generate QR codes for physical diplomas
-
-## 🛠️ **Troubleshooting**
-
-### **Common Issues & Solutions:**
-
-1. **"Contract not deployed"**
-   ```bash
-   npm run deploy:local  # or deploy:sepolia
-   ```
-
-2. **"Insufficient funds"**
-   - Get testnet ETH from faucet
-   - Use localhost for free testing
-
-3. **"MetaMask connection failed"**
-   - Check network matches selection
-   - Use app's "Switch Network" button
-
-4. **"Transaction failed"**
-   - Ensure you're contract admin
-   - Check gas settings in MetaMask
-
-## 📊 **Project Stats**
-
-- **Lines of Code**: ~3,000+ (Smart Contracts + Frontend + Tests)
-- **Test Coverage**: 100% of smart contract functions
-- **Security Audits**: Self-audited with OpenZeppelin standards
-- **Gas Efficiency**: Optimized for minimal transaction costs
-- **Browser Support**: All modern browsers with MetaMask
-
-## 🏆 **Achievements**
-
-✅ **Complete Full-Stack DApp**  
-✅ **Production-Ready Smart Contract**  
-✅ **Comprehensive Test Suite**  
-✅ **Modern Web Interface**  
-✅ **Multi-Network Support**  
-✅ **Security Best Practices**  
-✅ **Professional Documentation**  
-✅ **5-Minute Demo Setup**  
-✅ **MetaMask Integration Guide**
-
-## 📞 **Support & Contact**
-
-- **🚀 Quick Start**: [QUICK_DEMO.md](./QUICK_DEMO.md)
-- **🦊 MetaMask Help**: [METAMASK_SETUP.md](./METAMASK_SETUP.md)
-- **🐛 Issues**: [GitHub Issues](https://github.com/sambett/Blockchain-diploma-Verification/issues)
-- **📖 Documentation**: [Project Wiki](https://github.com/sambett/Blockchain-diploma-Verification/wiki)
 
 ---
 
-## 🎓 **Ready to revolutionize diploma verification with blockchain technology!**
+**🚀 Ready to secure academic credentials with blockchain technology!**
 
-**⚡ Start now:** Follow the [QUICK_DEMO.md](./QUICK_DEMO.md) guide for instant setup!
-
-*Built with ❤️ for the future of education credentials*
+For questions, support, or contributions, please open an issue or contact the development team.
