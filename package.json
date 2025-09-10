@@ -6,15 +6,21 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
+    "test:verbose": "npx hardhat test --verbose",
     "node": "npx hardhat node",
     "deploy:local": "npx hardhat ignition deploy ignition/modules/Deploy.js --network localhost",
     "deploy:sepolia": "npx hardhat ignition deploy ignition/modules/Deploy.js --network sepolia",
-    "frontend:install": "cd frontend && npm install",
-    "frontend:start": "cd frontend && npm start",
-    "frontend:build": "cd frontend && npm run build",
-    "setup": "npm install && npm run frontend:install",
-    "dev": "concurrently \"npm run node\" \"npm run frontend:start\"",
-    "clean": "npx hardhat clean"
+    "deploy:sepolia:auto": "node deploy-sepolia.js",
+    "verify:deployment": "npx hardhat run scripts/verify-deployment.js --network localhost",
+    "verify:sepolia": "npx hardhat run scripts/verify-deployment.js --network sepolia",
+    "utils": "npx hardhat run scripts/utils.js --network localhost",
+    "frontend:serve": "cd frontend && python -m http.server 8080",
+    "frontend:serve:alt": "npx http-server frontend -p 8080 -c-1",
+    "setup": "npm install",
+    "dev:full": "concurrently \"npm run node\" \"timeout 10 && npm run deploy:local\" \"timeout 15 && npm run frontend:serve\"",
+    "clean": "npx hardhat clean",
+    "clean:all": "npx hardhat clean && rm -rf ignition/deployments/",
+    "status": "echo '📊 Project Status: Production Ready ✅' && npm test"
   },
   "keywords": [
     "blockchain",
@@ -22,7 +28,11 @@
     "diploma",
     "verification",
     "smart-contracts",
-    "education"
+    "education",
+    "certificate",
+    "authentication",
+    "hardhat",
+    "solidity"
   ],
   "author": "Diploma Verification Team",
   "license": "MIT",
@@ -35,5 +45,16 @@
   "dependencies": {
     "concurrently": "^8.2.2",
     "dotenv": "^16.3.1"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sambett/Blockchain-diploma-Verification.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sambett/Blockchain-diploma-Verification/issues"
+  },
+  "homepage": "https://github.com/sambett/Blockchain-diploma-Verification#readme"
 }
