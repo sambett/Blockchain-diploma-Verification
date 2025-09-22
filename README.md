@@ -105,7 +105,6 @@ npm run test:verbose     # Run tests with detailed output
 ```bash
 npm run node             # Start local Hardhat network
 npm run deploy:local     # Deploy to local network
-npm run deploy:sepolia   # Deploy to Sepolia testnet
 npm run verify:deployment # Verify deployment
 ```
 
@@ -135,7 +134,6 @@ npm run dev:full        # Start network + deploy + frontend
 The project supports multiple networks:
 
 - **Local Development**: Hardhat Network (Chain ID: 31337)
-- **Testnet**: Sepolia (configurable in `hardhat.config.js`)
 
 ### MetaMask Setup
 
@@ -311,25 +309,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Ethereum Foundation** - Blockchain platform
 - **University of Sfax** - Academic collaboration and guidance
 
-## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/sambett/Blockchain-diploma-Verification/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/sambett/Blockchain-diploma-Verification/discussions)
-- **Email**: [Contact Team](mailto:contact@diploma-verification.com)
-
-## 🎯 Roadmap
-
-### v1.1 (Next Release)
-- [ ] Multi-chain support (Polygon, BSC)
-- [ ] Batch diploma issuance
-- [ ] Advanced analytics dashboard
-- [ ] Mobile app development
-
-### v2.0 (Future)
-- [ ] IPFS integration for metadata
-- [ ] NFT diploma certificates
-- [ ] Cross-university recognition
-- [ ] API for third-party integration
 
 ---
 
