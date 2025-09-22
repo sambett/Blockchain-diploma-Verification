@@ -209,7 +209,7 @@ npm test
 - **Gas Optimization**: Efficient storage patterns
 
 ### Privacy Protection
-- **Hash-Only Storage**: Only SHA-256 hashes stored on-chain
+- **Hash-Only Storage**: Only  Keccak-256 hashes stored on-chain
 - **No Personal Data**: Student information never touches blockchain
 - **GDPR Compliant**: Right to be forgotten supported
 
